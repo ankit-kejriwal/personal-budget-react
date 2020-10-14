@@ -1,6 +1,31 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import Doughnut from '../Doughnut/Doughnut';
+import PieChart from '../PieChart/PieChart';
+import axios from 'axios';
 
 function HomePage() {
+
+    const [dataState, setDataState] = useState({
+        data: [],
+        labels: []
+    });
+
+    useEffect(() => {
+        const apiUrl = `http://localhost:3001/budget`;
+        var newData = [];
+        var newLabels = [];
+        axios.get(apiUrl)
+        .then(res => {
+            for(var i  = 0;i<res.data.myBudget.length;i++){
+                newData[i] = res.data.myBudget[i].budget;
+                newLabels[i] = res.data.myBudget[i].title;
+            }
+            setDataState({
+                data: newData,
+                labels: newLabels
+            })
+        })
+      }, []);
   return (
     <main id="main" aria-label="Main" className="container center">
         <section 
@@ -56,14 +81,15 @@ function HomePage() {
     
             <article  className="text-box">
                 <h2>D3 Chart</h2>
-                <p  id="graph" className="svg-container">
-                </p>
+                <PieChart dataPoint={dataState.data}
+                    labels={dataState.labels}></PieChart>
             </article>
     
             <article  className="text-box">
                 <h2>Chart</h2>
                 <p>
-                    <canvas id="myChart" width="400" height="400"></canvas>
+                    <Doughnut data={dataState.data}
+                    labels={dataState.labels} />
                 </p>
             </article>
 
